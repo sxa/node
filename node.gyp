@@ -244,7 +244,13 @@
           ],
           'conditions': [
             [ 'node_module_version!=""', {
-              'product_extension': 'so.<(node_module_version)',
+              'conditions': [
+                [ 'OS=="mac"', {
+                  'product_extension': '<(node_module_version).dylib',
+                }, {
+                  'product_extension': 'so.<(node_module_version)',
+                }]
+              ]
             }]
           ],
         }],

@@ -1349,7 +1349,10 @@ $(obj).$(TOOLSET)/$(TARGET)/%%.o: $(obj)/%%%s FORCE_DO_CMD
       if target[:3] == 'lib':
         target = target[3:]
       target_prefix = 'lib'
-      target_ext = '.so'
+      if self.flavor == 'aix':
+        target_ext = '.a'
+      else:
+        target_ext = '.so'
     elif self.type == 'none':
       target = '%s.stamp' % target
     elif self.type != 'executable':

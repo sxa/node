@@ -916,6 +916,17 @@
     ['OS=="aix"', {
       'targets': [
         {
+          'conditions': [
+            ['node_shared=="true"', {
+              'target_name': 'libnode.<(node_module_version)',
+              'ldflags': ['--shared'],
+              'type': 'shared_library',
+            }, {
+              'target_name': 'node',
+              'type': 'executable',
+            }],
+          ],
+
           'target_name': 'node',
           'type': 'executable',
           'dependencies': ['<(node_core_target_name)', 'node_exp'],

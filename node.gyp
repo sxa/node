@@ -873,7 +873,7 @@
         {
           'conditions': [
             ['node_shared=="true"', {
-              'target_name': 'libnode',
+              'target_name': 'libnode.<(node_module_version)',
               'ldflags': ['--shared'],
               'type': 'shared_library',
             }, {

@@ -916,8 +916,17 @@
     ['OS=="aix"', {
       'targets': [
         {
-          'target_name': 'libnode',
-          'type': 'shared_library',
+
+          'conditions': [
+            ['node_shared=="true"', {
+              'target_name': 'libnode.<(node_module_version)',
+              'type': 'shared_library',
+            }, {
+              'target_name': 'node',
+              'type': 'executable',
+              'sources': ['src/node_main.cc'],
+            }],
+          ],
           'dependencies': ['<(node_core_target_name)', 'node_exp'],
 
           'include_dirs': [

@@ -916,8 +916,8 @@
     ['OS=="aix"', {
       'targets': [
         {
-          'target_name': 'node',
-          'type': 'executable',
+          'target_name': 'libnode.a',
+          'type': 'shared_library',
           'dependencies': ['<(node_core_target_name)', 'node_exp'],
 
           'include_dirs': [
@@ -926,7 +926,6 @@
           ],
 
           'sources': [
-            'src/node_main.cc',
             '<@(library_files)',
             # node.gyp is added to the project by default.
             'common.gypi',

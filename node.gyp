@@ -916,7 +916,7 @@
     ['OS=="aix"', {
       'targets': [
         {
-          'target_name': 'libnode.a',
+          'target_name': 'libnode',
           'type': 'shared_library',
           'dependencies': ['<(node_core_target_name)', 'node_exp'],
 

@@ -935,7 +935,6 @@
           ],
 
           'sources': [
-            'src/node_main.cc',
             '<@(library_files)',
             # node.gyp is added to the project by default.
             'common.gypi',

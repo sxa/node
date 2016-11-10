@@ -921,6 +921,7 @@
             ['node_shared=="true"', {
               'target_name': 'libnode.<(node_module_version)',
               'type': 'shared_library',
+              'sources': ['src/node_main.cc'],
             }, {
               'target_name': 'node',
               'type': 'executable',

@@ -35,7 +35,10 @@
 #
 echo "Searching $1 to write out expfile to $2"
 
+ls -ld $1 $2
+find . -name \*stamp   
 # this special sequence must be at the start of the exp file
+
 echo "#!." > $2.tmp
 
 # pull the symbols from the .a files
@@ -48,3 +51,6 @@ find $1 -name "*.a" | grep -v gtest \
   | sort -u >> $2.tmp
 
 mv -f $2.tmp $2
+
+ls -ld $1 $2
+find . -name \*stamp   

@@ -810,20 +810,16 @@
     ['OS=="aix"', {
       'targets': [
         {
+          'target_name': 'node',
           'conditions': [
             ['node_shared=="true"', {
-              'target_name': 'libnode.<(node_module_version)',
-              'ldflags': ['--shared'],
               'type': 'shared_library',
+              'ldflags': ['--shared'],
+              'product_extension': '<(shlib_suffix)',
             }, {
-              'target_name': 'node',
               'type': 'executable',
-              'sources': ['src/node_main.cc'],
             }],
           ],
-
-          'target_name': 'node',
-          'type': 'executable',
           'dependencies': ['<(node_core_target_name)', 'node_exp'],
 
           'include_dirs': [
@@ -832,6 +828,7 @@
           ],
 
           'sources': [
+            'src/node_main.cc',
             '<@(library_files)',
             # node.gyp is added to the project by default.
             'common.gypi',

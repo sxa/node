@@ -92,7 +92,10 @@ def CalculateVariables(default_variables, params):
     if flavor == 'android':
       operating_system = 'linux'  # Keep this legacy behavior for now.
     default_variables.setdefault('OS', operating_system)
-    default_variables.setdefault('SHARED_LIB_SUFFIX', '.so')
+    if flavor == 'aix':
+      default_variables.setdefault('SHARED_LIB_SUFFIX', '.a')
+    else:
+      default_variables.setdefault('SHARED_LIB_SUFFIX', '.so')
     default_variables.setdefault('SHARED_LIB_DIR','$(builddir)/lib.$(TOOLSET)')
     default_variables.setdefault('LIB_DIR', '$(obj).$(TOOLSET)')
 

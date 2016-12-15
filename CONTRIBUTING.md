@@ -282,3 +282,26 @@ By making a contribution to this project, I certify that:
   personal information I submit with it, including my sign-off) is
   maintained indefinitely and may be redistributed consistent with
   this project or the open source license(s) involved.
+
+#### Floating patches from other products (e.g. V8/GYP/NPM/OpenSSL etc)
+
+Generally any changes that need to be made in third-party dependency should
+be submitted into their codebase first otherwise they will be rejeected.  If
+possible, Node.js should then pick up the new version of the dependency to
+include the fix.  In some cases this may not be possible, for example:
+
+* The product has not released a new version with the fix yet and the issue
+  is critical enough to get it in quickly anyway.
+
+* The dependency cannot be trivially updated in the node stream (for example
+  we would not change the V8 version within a major release - for more
+  information on handling V8 fixes, see
+  https://github.com/nodejs/node/blob/master/doc/guides/maintaining-V8.md)  
+
+* The product will not accept the fix for whatever reason.
+
+In these cases, a PR can be submitted to make the change directly in Node.js
+without updating the whole dependency.  In this case there should be a Ref:
+to the upstream patch included in the commit, although this may not always
+be possible for the third case above. If you're making a change to V8,
+please increment V8_PATCH_LEVEL in deps/v8/include/v8-version.h.

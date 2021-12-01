@@ -32,4 +32,6 @@ else:
       python_cmd_path = which(python_cmd)
       if python_cmd_path and 'pyenv/shims' not in python_cmd_path:
         sys.stderr.write('\t{} {}\n'.format(python_cmd_path, ' '.join(sys.argv[:1])))
+  sys.stderr.write('You may override this error by running "python ./configure.py" but we cannot guarantee it will work.\n')
+  sys.stderr.write('If your python is newer than the ones we support, please test it and ask if it can be supported via an issue at https://github.com/nodejs/node\n')
   sys.exit(1)

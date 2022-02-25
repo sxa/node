@@ -172,6 +172,12 @@ event loop is doing.
 
 <!-- YAML
 added: v0.9.1
+changes:
+  - version: REPLACEME
+    pr-url: https://github.com/nodejs/node/pull/41678
+    description: Passing an invalid callback to the `callback` argument
+                 now throws `ERR_INVALID_ARG_TYPE` instead of
+                 `ERR_INVALID_CALLBACK`.
 -->
 
 * `callback` {Function} The function to call at the end of this turn of
@@ -197,6 +203,12 @@ This method has a custom variant for promises that is available using
 
 <!-- YAML
 added: v0.0.1
+changes:
+  - version: REPLACEME
+    pr-url: https://github.com/nodejs/node/pull/41678
+    description: Passing an invalid callback to the `callback` argument
+                 now throws `ERR_INVALID_ARG_TYPE` instead of
+                 `ERR_INVALID_CALLBACK`.
 -->
 
 * `callback` {Function} The function to call when the timer elapses.
@@ -219,6 +231,12 @@ This method has a custom variant for promises that is available using
 
 <!-- YAML
 added: v0.0.1
+changes:
+  - version: REPLACEME
+    pr-url: https://github.com/nodejs/node/pull/41678
+    description: Passing an invalid callback to the `callback` argument
+                 now throws `ERR_INVALID_ARG_TYPE` instead of
+                 `ERR_INVALID_CALLBACK`.
 -->
 
 * `callback` {Function} The function to call when the timer elapses.
@@ -472,7 +490,56 @@ const interval = 100;
 })();
 ```
 
+### `timersPromises.scheduler.wait(delay[, options])`
+
+<!-- YAML
+added:
+  - v17.3.0
+  - v16.14.0
+-->
+
+> Stability: 1 - Experimental
+
+* `delay` {number} The number of milliseconds to wait before resolving the
+  promise.
+* `options` {Object}
+  * `signal` {AbortSignal} An optional `AbortSignal` that can be used to
+    cancel waiting.
+* Returns: {Promise}
+
+An experimental API defined by the [Scheduling APIs][] draft specification
+being developed as a standard Web Platform API.
+
+Calling `timersPromises.scheduler.wait(delay, options)` is roughly equivalent
+to calling `timersPromises.setTimeout(delay, undefined, options)` except that
+the `ref` option is not supported.
+
+```mjs
+import { scheduler } from 'timers/promises';
+
+await scheduler.wait(1000); // Wait one second before continuing
+```
+
+### `timersPromises.scheduler.yield()`
+
+<!-- YAML
+added:
+  - v17.3.0
+  - v16.14.0
+-->
+
+> Stability: 1 - Experimental
+
+* Returns: {Promise}
+
+An experimental API defined by the [Scheduling APIs][] draft specification
+being developed as a standard Web Platform API.
+
+Calling `timersPromises.scheduler.yield()` is equivalent to calling
+`timersPromises.setImmediate()` with no arguments.
+
 [Event Loop]: https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/#setimmediate-vs-settimeout
+[Scheduling APIs]: https://github.com/WICG/scheduling-apis
 [`AbortController`]: globals.md#class-abortcontroller
 [`TypeError`]: errors.md#class-typeerror
 [`clearImmediate()`]: #clearimmediateimmediate

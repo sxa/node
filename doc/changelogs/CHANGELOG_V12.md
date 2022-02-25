@@ -9,6 +9,9 @@
 </tr>
 <tr>
 <td valign="top">
+<a href="#12.22.10">12.22.10</a><br/>
+<a href="#12.22.9">12.22.9</a><br/>
+<a href="#12.22.8">12.22.8</a><br/>
 <a href="#12.22.7">12.22.7</a><br/>
 <a href="#12.22.6">12.22.6</a><br/>
 <a href="#12.22.5">12.22.5</a><br/>
@@ -79,6 +82,104 @@
   * [0.10.x](CHANGELOG_V010.md)
   * [io.js](CHANGELOG_IOJS.md)
   * [Archive](CHANGELOG_ARCHIVE.md)
+
+<a id="12.22.10"></a>
+
+## 2022-02-01, Version 12.22.10 'Erbium' (LTS), @ruyadorno
+
+### Notable changes
+
+* Upgrade npm to 6.14.16
+* Updated ICU time zone data
+
+### Commits
+
+* \[[`33899b435d`](https://github.com/nodejs/node/commit/33899b435d)] - **deps**: upgrade npm to 6.14.16 (Ruy Adorno) [#41601](https://github.com/nodejs/node/pull/41601)
+* \[[`d9237c46ca`](https://github.com/nodejs/node/commit/d9237c46ca)] - **tools**: update tzdata to 2021a4 (Albert Wang) [#41443](https://github.com/nodejs/node/pull/41443)
+
+<a id="12.22.9"></a>
+
+## 2022-01-10, Version 12.22.9 'Erbium' (LTS), @richardlau
+
+This is a security release.
+
+### Notable changes
+
+#### Improper handling of URI Subject Alternative Names (Medium)(CVE-2021-44531)
+
+Accepting arbitrary Subject Alternative Name (SAN) types, unless a PKI is specifically defined to use a particular SAN type, can result in bypassing name-constrained intermediates. Node.js was accepting URI SAN types, which PKIs are often not defined to use. Additionally, when a protocol allows URI SANs, Node.js did not match the URI correctly.
+
+Versions of Node.js with the fix for this disable the URI SAN type when checking a certificate against a hostname. This behavior can be reverted through the `--security-revert` command-line option.
+
+More details will be available at [CVE-2021-44531](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-44531) after publication.
+
+#### Certificate Verification Bypass via String Injection (Medium)(CVE-2021-44532)
+
+Node.js converts SANs (Subject Alternative Names) to a string format. It uses this string to check peer certificates against hostnames when validating connections. The string format was subject to an injection vulnerability when name constraints were used within a certificate chain, allowing the bypass of these name constraints.
+
+Versions of Node.js with the fix for this escape SANs containing the problematic characters in order to prevent the injection. This behavior can be reverted through the `--security-revert` command-line option.
+
+More details will be available at [CVE-2021-44532](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-44532) after publication.
+
+#### Incorrect handling of certificate subject and issuer fields (Medium)(CVE-2021-44533)
+
+Node.js did not handle multi-value Relative Distinguished Names correctly. Attackers could craft certificate subjects containing a single-value Relative Distinguished Name that would be interpreted as a multi-value Relative Distinguished Name, for example, in order to inject a Common Name that would allow bypassing the certificate subject verification.
+
+Affected versions of Node.js do not accept multi-value Relative Distinguished Names and are thus not vulnerable to such attacks themselves. However, third-party code that uses node's ambiguous presentation of certificate subjects may be vulnerable.
+
+More details will be available at [CVE-2021-44533](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-44533) after publication.
+
+#### Prototype pollution via `console.table` properties (Low)(CVE-2022-21824)
+
+Due to the formatting logic of the `console.table()` function it was not safe to allow user controlled input to be passed to the `properties` parameter while simultaneously passing a plain object with at least one property as the first parameter, which could be `__proto__`. The prototype pollution has very limited control, in that it only allows an empty string to be assigned numerical keys of the object prototype.
+
+Versions of Node.js with the fix for this use a null protoype for the object these properties are being assigned to.
+
+More details will be available at [CVE-2022-21824](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2022-21824) after publication.
+
+Thanks to Patrik Oldsberg (rugvip) for reporting this vulnerability.
+
+### Commits
+
+* \[[`be69403528`](https://github.com/nodejs/node/commit/be69403528)] - **console**: fix prototype pollution via console.table (Tobias Nießen) [nodejs-private/node-private#307](https://github.com/nodejs-private/node-private/pull/307)
+* \[[`19873abfb2`](https://github.com/nodejs/node/commit/19873abfb2)] - **crypto,tls**: implement safe x509 GeneralName format (Tobias Nießen and Akshay Kumar) [nodejs-private/node-private#300](https://github.com/nodejs-private/node-private/pull/300)
+* \[[`ff9ac7d757`](https://github.com/nodejs/node/commit/ff9ac7d757)] - **doc**: fix date for v12.22.8 (Richard Lau) [#41213](https://github.com/nodejs/node/pull/41213)
+* \[[`a5c7843cab`](https://github.com/nodejs/node/commit/a5c7843cab)] - **src**: add cve reverts and associated tests (Michael Dawson and Akshay Kumar) [nodejs-private/node-private#300](https://github.com/nodejs-private/node-private/pull/300)
+* \[[`d4e5d1b9ca`](https://github.com/nodejs/node/commit/d4e5d1b9ca)] - **src**: remove unused x509 functions (Tobias Nießen and Akshay Kumar) [nodejs-private/node-private#300](https://github.com/nodejs-private/node-private/pull/300)
+* \[[`8c2db2c86b`](https://github.com/nodejs/node/commit/8c2db2c86b)] - **tls**: fix handling of x509 subject and issuer (Tobias Nießen and Akshay Kumar) [nodejs-private/node-private#300](https://github.com/nodejs-private/node-private/pull/300)
+* \[[`e0fe6a635e`](https://github.com/nodejs/node/commit/e0fe6a635e)] - **tls**: drop support for URI alternative names (Tobias Nießen and Akshay Kumar) [nodejs-private/node-private#300](https://github.com/nodejs-private/node-private/pull/300)
+
+<a id="12.22.8"></a>
+
+## 2021-12-16, Version 12.22.8 'Erbium' (LTS), @richardlau
+
+### Notable Changes
+
+This release contains a c-ares update to fix a regression introduced in
+Node.js 12.22.5 resolving CNAME records containing underscores
+[#39780](https://github.com/nodejs/node/issues/39780).
+
+Root certificates have been updated to those from Mozilla's Network
+Security Services 3.71 [#40281](https://github.com/nodejs/node/pull/40280).
+
+### Commits
+
+* \[[`2d42295d2a`](https://github.com/nodejs/node/commit/2d42295d2a)] - **build**: pin macOS GitHub runner to macos-10.15 (Richard Lau) [#41124](https://github.com/nodejs/node/pull/41124)
+* \[[`41e09ec71b`](https://github.com/nodejs/node/commit/41e09ec71b)] - **child\_process**: retain reference to data with advanced serialization (Anna Henningsen) [#38728](https://github.com/nodejs/node/pull/38728)
+* \[[`f0be07796e`](https://github.com/nodejs/node/commit/f0be07796e)] - **crypto**: update root certificates (Richard Lau) [#40280](https://github.com/nodejs/node/pull/40280)
+* \[[`4c9f920d34`](https://github.com/nodejs/node/commit/4c9f920d34)] - **deps**: update archs files for OpenSSL-1.1.1m (Richard Lau) [#41172](https://github.com/nodejs/node/pull/41172)
+* \[[`60d7d4171e`](https://github.com/nodejs/node/commit/60d7d4171e)] - **deps**: upgrade openssl sources to 1.1.1m (Richard Lau) [#41172](https://github.com/nodejs/node/pull/41172)
+* \[[`7feff67419`](https://github.com/nodejs/node/commit/7feff67419)] - **deps**: add -fno-strict-aliasing flag to libuv (Daniel Bevenius) [#40631](https://github.com/nodejs/node/pull/40631)
+* \[[`534ac7c7c6`](https://github.com/nodejs/node/commit/534ac7c7c6)] - **deps**: update c-ares to 1.18.1 (Richard Lau) [#40660](https://github.com/nodejs/node/pull/40660)
+* \[[`c019fa9b70`](https://github.com/nodejs/node/commit/c019fa9b70)] - **deps**: update to cjs-module-lexer\@1.2.2 (Guy Bedford) [#39402](https://github.com/nodejs/node/pull/39402)
+* \[[`b13340eff4`](https://github.com/nodejs/node/commit/b13340eff4)] - **doc**: add alternative version links to the packages page (Filip Skokan) [#36915](https://github.com/nodejs/node/pull/36915)
+* \[[`243b2fbfdb`](https://github.com/nodejs/node/commit/243b2fbfdb)] - **lib**: fix regular expression to detect \`/\` and \`\\\` (Francesco Trotta) [#40325](https://github.com/nodejs/node/pull/40325)
+* \[[`70e094a26b`](https://github.com/nodejs/node/commit/70e094a26b)] - **repl**: fix error message printing (Anna Henningsen) [#38209](https://github.com/nodejs/node/pull/38209)
+* \[[`02b432a704`](https://github.com/nodejs/node/commit/02b432a704)] - **src**: fix crash in AfterGetAddrInfo (Anna Henningsen) [#39735](https://github.com/nodejs/node/pull/39735)
+* \[[`7479447d6a`](https://github.com/nodejs/node/commit/7479447d6a)] - **test**: deflake child-process-pipe-dataflow (Luigi Pinca) [#40838](https://github.com/nodejs/node/pull/40838)
+* \[[`833e199393`](https://github.com/nodejs/node/commit/833e199393)] - **tools**: update certdata.txt (Richard Lau) [#40280](https://github.com/nodejs/node/pull/40280)
+* \[[`e4339fe286`](https://github.com/nodejs/node/commit/e4339fe286)] - **tools**: add script to update c-ares (Richard Lau) [#40660](https://github.com/nodejs/node/pull/40660)
+* \[[`f50b9c1e8a`](https://github.com/nodejs/node/commit/f50b9c1e8a)] - **worker**: avoid potential deadlock on NearHeapLimit (Santiago Gimeno) [#38403](https://github.com/nodejs/node/pull/38403)
 
 <a id="12.22.7"></a>
 

@@ -562,6 +562,11 @@ class Parser : public AsyncWrap, public StreamListener {
       lenient_flags = args[3].As<Int32>()->Value();
     }
 
+    if (args.Length() > 4) {
+      CHECK(args[4]->IsInt32());
+      headers_timeout = args[4].As<Int32>()->Value();
+    }
+
     llhttp_type_t type =
         static_cast<llhttp_type_t>(args[0].As<Int32>()->Value());
 

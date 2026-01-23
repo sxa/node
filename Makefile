@@ -540,16 +540,16 @@ clear-stalled: ## Clear any stalled processes.
 	$(info Clean up any leftover processes but do not error if any were found.)
 	out/Release/node &
 	PATH=$PWD/out/Release node &
-	@PS_OUT=`ps awwx | grep Release/node | grep -v grep | awk '{print $$1}'`; \
-	if [ "$${PS_OUT}" ]; then \
-		ps awwx | grep Release/node | grep -v grep; \
-		$(info Some Release/node processes were detected as listed above - killing $${PS_OUT}); \
-		kill -9 $${PS_OUT} ;
+	@PS_OUT=`ps awwx | grep Release/node | grep -v grep | awk '{print $$1}'`;
+	if [ "$${PS_OUT}" ]; then
+		ps awwx | grep Release/node | grep -v grep
+		$(info Some Release/node processes were detected as listed above - killing $${PS_OUT})
+		kill -9 $${PS_OUT}
 	fi
-	@PS_OUT=`ps awwx | grep Release/node | grep -v grep | awk '{print $$1}'`; \
-	if [ "$${PS_OUT}" ]; then \
-		ps awwx | grep " node " | grep -v grep; \
-		$(warning Some other node may have been left from other jobs as listed above - leaving them for now) ; \
+	@PS_OUT=`ps awwx | grep Release/node | grep -v grep | awk '{print $$1}'`;
+	if [ "$${PS_OUT}" ]; then
+		ps awwx | grep " node " | grep -v grep;
+		$(warning Some other node may have been left from other jobs as listed above - leaving them for now) ;
 	fi
 
 .PHONY: test-build

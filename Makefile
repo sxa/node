@@ -537,11 +537,19 @@ endif
 
 .PHONY: clear-stalled
 clear-stalled: ## Clear any stalled processes.
-	$(info Clean up any leftover processes but don't error if found.)
-	ps awwx | grep Release/node | grep -v grep | cat
+	$(info Clean up any leftover processes but do not error if any were found.)
+	out/Release/node &
+	PATH=$PWD/out/Release node &
 	@PS_OUT=`ps awwx | grep Release/node | grep -v grep | awk '{print $$1}'`; \
 	if [ "$${PS_OUT}" ]; then \
-		echo $${PS_OUT} | xargs kill -9; \
+		ps awwx | grep Release/node | grep -v grep; \
+		$(info Some Release/node processes were detected as listed above - killing $${PS_OUT}); \
+		kill -9 $${PS_OUT} ;
+	fi
+	@PS_OUT=`ps awwx | grep Release/node | grep -v grep | awk '{print $$1}'`; \
+	if [ "$${PS_OUT}" ]; then \
+		ps awwx | grep " node " | grep -v grep; \
+		$(warning Some other node may have been left from other jobs as listed above - leaving them for now) ; \
 	fi
 
 .PHONY: test-build
@@ -598,10 +606,12 @@ test-ci-js: | clear-stalled ## Build and test JavaScript with building anything 
 		--skip-tests=$(CI_SKIP_TESTS) \
 		$(TEST_CI_ARGS) $(CI_JS_SUITES)
 	$(info Clean up any leftover processes, error if found.)
-	ps awwx | grep Release/node | grep -v grep | cat
 	@PS_OUT=`ps awwx | grep Release/node | grep -v grep | awk '{print $$1}'`; \
 	if [ "$${PS_OUT}" ]; then \
-		echo $${PS_OUT} | xargs kill -9; exit 1; \
+		ps awwx | grep Release/node | grep -v grep; \
+		$(info Some Release/node processes were detected as listed above - killing $${PS_OUT}); \
+		kill -9 $${PS_OUT}; \
+		exit 1; \
 	fi
 
 .PHONY: test-ci

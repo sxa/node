@@ -800,8 +800,7 @@ Environment::Environment(IsolateData* isolate_data,
                          const std::vector<std::string>& exec_args,
                          const EnvSerializeInfo* env_info,
                          EnvironmentFlags::Flags flags,
-                         ThreadId thread_id,
-                         std::string_view thread_name)
+                         ThreadId thread_id)
     : isolate_(isolate),
       external_memory_accounter_(new ExternalMemoryAccounter()),
       isolate_data_(isolate_data),
@@ -828,8 +827,7 @@ Environment::Environment(IsolateData* isolate_data,
       flags_(flags),
       thread_id_(thread_id.id == static_cast<uint64_t>(-1)
                      ? AllocateEnvironmentThreadId().id
-                     : thread_id.id),
-      thread_name_(thread_name) {
+                     : thread_id.id) {
   if (!is_main_thread()) {
     // If this is a Worker thread, we can always safely use the parent's
     // Isolate's code cache because of the shared read-only heap.

@@ -395,7 +395,7 @@ try {
   // This will throw an error, because anyObject is not cloneable.
   port1.postMessage(anyObject);
 } catch (error) {
-  // error.name === 'DataCloneError'
+  // error.name ===	 'DataCloneError'
 }
 ```
 

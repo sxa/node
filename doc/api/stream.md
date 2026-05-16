@@ -2948,6 +2948,9 @@ const server = http.createServer((req, res) => {
 <!-- YAML
 added: v16.9.0
 changes:
+  - version: REPLACEME
+    pr-url: https://github.com/nodejs/node/pull/62562
+    description: Marking the API stable.
   - version:
     - v21.1.0
     - v20.10.0
@@ -2960,7 +2963,7 @@ changes:
     description: Added support for webstreams.
 -->
 
-> Stability: 1 - `stream.compose` is experimental.
+> Stability: 2 - Stable
 
 * `streams` {Stream\[]|Iterable\[]|AsyncIterable\[]|Function\[]|
   ReadableStream\[]|WritableStream\[]|TransformStream\[]|Duplex\[]|Function}

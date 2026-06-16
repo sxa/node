@@ -1041,7 +1041,7 @@ function load(url, context, nextLoad) {
   };
 }
 
-registerHooks({ load });
+registerHooks({ resolve });
 ```
 
 In a more advanced scenario, this can also be used to transform an unsupported

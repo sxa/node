@@ -2402,8 +2402,11 @@
           '<(HIGHWAY_ROOT)/src',
         ],
         'conditions': [
-          ['v8_target_arch=="ia32"', {
-            'defines': ['HWY_BROKEN_TARGETS=(HWY_AVX2|HWY_AVX3)',],
+          ['v8_target_arch=="riscv64"', {
+            'defines': ['HWY_BROKEN_TARGETS=HWY_RVV',],
+          }],
+          ['v8_target_arch=="arm64"', {
+            'defines': ['HWY_BROKEN_TARGETS=HWY_ALL_SVE',],
           }],
           ['v8_target_arch=="arm64"', {
             'defines': ['HWY_BROKEN_TARGETS=HWY_ALL_SVE',],
@@ -2431,6 +2434,9 @@
         }],
         ['v8_target_arch=="arm64"', {
           'defines': ['HWY_BROKEN_TARGETS=HWY_ALL_SVE',],
+        }],
+        ['v8_target_arch=="riscv64"', {
+          'defines': ['HWY_BROKEN_TARGETS=HWY_RVV',],
         }],
         ['v8_target_arch=="ppc64" or v8_target_arch=="s390x"', {
           'defines': ['TOOLCHAIN_MISS_ASM_HWCAP_H',],

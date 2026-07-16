@@ -546,6 +546,9 @@
       ['v8_enable_wasm_simd256_revec==1', {
         'defines': ['V8_ENABLE_WASM_SIMD256_REVEC',],
       }],
+      ['v8_target_arch=="riscv64"', {
+        'defines': ['V8_DISABLE_RVV',],
+      }],
     ],  # conditions
     'defines': [
       'V8_GYP_BUILD',

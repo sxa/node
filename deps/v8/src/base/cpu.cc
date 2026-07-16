@@ -1042,9 +1042,11 @@ CPU::CPU()
   riscv_hwprobe pairs[] = {{RISCV_HWPROBE_KEY_IMA_EXT_0, 0}};
   if (!syscall(__NR_riscv_hwprobe, &pairs,
                sizeof(pairs) / sizeof(riscv_hwprobe), 0, nullptr, 0)) {
+#ifndef V8_DISABLE_RVV
     if (pairs[0].value & RISCV_HWPROBE_IMA_V) {
       has_rvv_ = true;
     }
+#endif  // !V8_DISABLE_RVV
     if (pairs[0].value & RISCV_HWPROBE_IMA_FD) {
       has_fpu_ = true;
     }
@@ -1070,10 +1072,12 @@ CPU::CPU()
   if (HasFeature("rv64imafdc")) {
     has_fpu_ = true;
   }
+#ifndef V8_DISABLE_RVV
   if (HasFeature("rv64imafdcv")) {
     has_fpu_ = true;
     has_rvv_ = true;
   }
+#endif  // !V8_DISABLE_RVV
 #endif
 
   char* mmu = cpu_info.ExtractField("mmu");
@@ -1087,9 +1091,11 @@ CPU::CPU()
     riscv_mmu_ = RV_MMU_MODE::kRiscvSV57;
   }
 #endif
+#ifndef V8_DISABLE_RVV
   if (has_rvv_) {
     vlen_ = vlen_intrinsic();
   }
+#endif  // !V8_DISABLE_RVV
 #endif  // V8_HOST_ARCH_RISCV64
 }
 

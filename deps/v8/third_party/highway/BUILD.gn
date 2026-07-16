@@ -19,6 +19,12 @@ config("libhwy_external_config") {
     # for absl::uint128 is 16.
     defines += [ "HWY_BROKEN_TARGETS=HWY_ALL_SVE" ]
   }
+  if (target_cpu == "riscv64" || target_cpu == "riscv32") {
+    # RVV stubs can SIGILL on some RISC-V hardware (e.g. SpacemiT K3/X100 with
+    # Smstateen) when vector state is not enabled for the thread. Force the
+    # EMU128/SCALAR Highway fallback instead.
+    defines += [ "HWY_BROKEN_TARGETS=HWY_RVV" ]
+  }
   if (target_cpu == "ppc64" || target_cpu == "s390x") {
     # Not using <asm/hwcap.h> on ppc64/s390x:
     # https://github.com/google/highway/issues/2406

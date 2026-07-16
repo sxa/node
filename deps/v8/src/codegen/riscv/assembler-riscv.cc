@@ -56,9 +56,10 @@ constexpr CpuFeatureSet CpuFeaturesImpliedByCompiler() {
   features.Add(FPU);
 #endif  // def __riscv_f
 
-#if (defined __riscv_vector) && (__riscv_v >= 1000000)
+#if !defined(V8_DISABLE_RVV) && (defined __riscv_vector) && \
+    (__riscv_v >= 1000000)
   features.Add(RISCV_SIMD);
-#endif  // def __riscv_vector && __riscv_v >= 1000000
+#endif  // !V8_DISABLE_RVV && def __riscv_vector && __riscv_v >= 1000000
 
 #if (defined __riscv_zba)
   features.Add(ZBA);
@@ -81,7 +82,9 @@ constexpr CpuFeatureSet CpuFeaturesImpliedByCompiler() {
 #ifdef RISCV_TARGET_SIMULATOR
 static CpuFeatureSet SimulatorFeatures() {
   CpuFeatureSet features;
+#ifndef V8_DISABLE_RVV
   features.Add(RISCV_SIMD);
+#endif  // !V8_DISABLE_RVV
   features.Add(ZBA);
   features.Add(ZBB);
   features.Add(ZBS);
@@ -109,11 +112,13 @@ void CpuFeatures::ProbeImpl(bool cross_compile) {
 #ifndef USE_SIMULATOR
   base::CPU cpu;
   if (cpu.has_fpu()) supported_.Add(FPU);
+#ifndef V8_DISABLE_RVV
   if (cpu.has_rvv()) {
     supported_.Add(RISCV_SIMD);
     vlen_ = cpu.vlen();
     DCHECK_NE(vlen_, base::CPU::kUnknownVlen);
   }
+#endif  // !V8_DISABLE_RVV
   if (cpu.has_zba()) supported_.Add(ZBA);
   if (cpu.has_zbb()) supported_.Add(ZBB);
   if (cpu.has_zbs()) supported_.Add(ZBS);

@@ -505,7 +505,7 @@ void RegExpMacroAssemblerRISCV::SkipUntilBitInTable(
     int cp_offset, Handle<ByteArray> table,
     Handle<ByteArray> nibble_table_array, int advance_by, Label* on_match,
     Label* on_no_match) {
-  const bool use_simd = SkipUntilBitInTableUseSimd(advance_by);
+  const bool use_simd = false /* SkipUntilBitInTableUseSimd(advance_by) */;
   if (use_simd) {
     DCHECK(!nibble_table_array.is_null());
     Label simd_repeat, found, scalar;

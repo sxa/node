@@ -43,6 +43,7 @@
 #include "src/diagnostics/disasm.h"
 #include "src/diagnostics/disassembler.h"
 #include "src/objects/heap-number-inl.h"
+#include <iostream>
 
 namespace v8 {
 namespace internal {
@@ -112,6 +113,8 @@ void CpuFeatures::ProbeImpl(bool cross_compile) {
   if (cpu.has_rvv()) {
     supported_.Add(RISCV_SIMD);
     vlen_ = cpu.vlen();
+    std::cerr << "RISC-V CPU Vector length detected as " << vlen_ << std::endl;
+    CpuFeatures::PrintFeatures();
     DCHECK_NE(vlen_, base::CPU::kUnknownVlen);
   }
   if (cpu.has_zba()) supported_.Add(ZBA);

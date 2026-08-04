@@ -114,7 +114,7 @@ void CpuFeatures::ProbeImpl(bool cross_compile) {
     supported_.Add(RISCV_SIMD);
     vlen_ = cpu.vlen();
     std::cerr << "RISC-V CPU Vector length detected as " << vlen_ << std::endl;
-    CpuFeatures::PrintFeatures();
+    // CpuFeatures::PrintFeatures();
     DCHECK_NE(vlen_, base::CPU::kUnknownVlen);
   }
   if (cpu.has_zba()) supported_.Add(ZBA);

@@ -632,6 +632,7 @@ class V8_EXPORT_PRIVATE Assembler : public AssemblerBase,
       // mf2 -> n is 1.
       // mf4 -> n is 2.
       // mf8 -> n is 3.
+      fprintf(stderr, "SXAEC: %d / %d / %f", CpuFeatures::vlen(), kRvvELEN, log2(kRvvELEN)-3);
       switch (CpuFeatures::vlen()) {
         case 128:
           lmul = m1;

@@ -36,6 +36,7 @@
 #define V8_CODEGEN_RISCV_ASSEMBLER_RISCV_H_
 
 #include <stdio.h>
+#include <math.h>
 
 #include <memory>
 #include <set>
@@ -636,10 +637,10 @@ class V8_EXPORT_PRIVATE Assembler : public AssemblerBase,
           lmul = m1;
           break;
         case 256:
-          lmul = (sew + 1) > kRvvELEN ? m1 : mf2;
+          lmul = (sew + 1) > (log2(kRvvELEN)-3) ? m1 : mf2;
           break;
         case 512:
-          lmul = (sew + 2) > kRvvELEN ? m1 : mf4;
+          lmul = (sew + 2) > (log2(kRvvELEN)-3) ? m1 : mf4;
           break;
         default:
           static_assert(kMaxRvvVLEN <= 512, "Unsupported VLEN");

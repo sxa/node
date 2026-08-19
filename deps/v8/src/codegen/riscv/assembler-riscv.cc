@@ -109,6 +109,9 @@ void CpuFeatures::ProbeImpl(bool cross_compile) {
 
 #ifndef USE_SIMULATOR
   base::CPU cpu;
+
+  std::cerr << "In assembler-riscv.cc - has fpu = " << cpu.has_fpu() << " and has_rvv = " << cpu.has_rvv() << std::endl;
+
   if (cpu.has_fpu()) supported_.Add(FPU);
   if (cpu.has_rvv()) {
     supported_.Add(RISCV_SIMD);

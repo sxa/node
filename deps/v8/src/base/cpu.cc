@@ -1074,6 +1074,12 @@ CPU::CPU()
     has_fpu_ = true;
     has_rvv_ = true;
   }
+  // SpacemiT K3 and similar boards report the hypervisor extension as part of
+  // the base ISA token (rv64imafdcvh) rather than rv64imafdcv.
+  if (HasFeature("rv64imafdcvh")) {
+    has_fpu_ = true;
+    has_rvv_ = true;
+  }
 #endif
 
   char* mmu = cpu_info.ExtractField("mmu");

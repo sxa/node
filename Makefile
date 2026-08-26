@@ -881,8 +881,14 @@ else ifeq ($(OSTYPE),os400)
 # TODO(@nodejs/web-infra): IBMi is currently hanging during HTML minification
 $(apidocs_html) $(apidocs_json) out/doc/api/all.html out/doc/api/all.json:
 	@echo "Skipping $@ (not currently supported by $(OSTYPE) machines)"
+else ifeq ($(ARCHTYPE),riscv64)
+# Many riscv64 environments (except qemu) fail on the wasm steps here
+# https://github.com/nodejs/build/issues/4099#issuecomment-4038743335
+$(apidocs_html) $(apidocs_json) out/doc/api/all.html out/doc/api/all.json:
+	@echo "Skipping $@ (not currently supported by $(DESTCPU) machines)"
 else
 $(apidocs_html) $(apidocs_json) out/doc/api/all.html out/doc/api/all.json &: $(apidoc_sources) tools/doc/node_modules | out/doc/api
+	@echo "Running docs generation which does not work on $(DESTCPU)"
 	@if [ "$(shell $(node_use_openssl_and_icu))" != "true" ]; then \
 		echo "Skipping $@ (no crypto and/or no ICU)"; \
 	else \

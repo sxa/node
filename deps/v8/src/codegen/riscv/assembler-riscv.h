@@ -648,8 +648,11 @@ class V8_EXPORT_PRIVATE Assembler : public AssemblerBase,
         case 512:
           lmul = (sew + 2) > E64 ? m1 : mf4;
           break;
+        case 1024:
+          lmul = sew == E64 ? m1 : sew == E32 ? mf2 : sew == E16 ? mf4 : mf8;
+          break;
         default:
-          static_assert(kMaxRvvVLEN <= 512, "Unsupported VLEN");
+          static_assert(kMaxRvvVLEN <= 1024, "Unsupported VLEN");
           UNIMPLEMENTED();
       }
       if (sew == E8) {
@@ -678,8 +681,11 @@ class V8_EXPORT_PRIVATE Assembler : public AssemblerBase,
         case 512:
           lmul = (sew + 3) > E64 ? (sew <= E32 ? mf2 : m1) : mf8;
           break;
+        case 1024:
+          lmul = sew == E64 ? m1 : sew == E32 ? mf2 : sew == E16 ? mf4 : mf8;
+          break;
         default:
-          static_assert(kMaxRvvVLEN <= 512, "Unsupported VLEN");
+          static_assert(kMaxRvvVLEN <= 1024, "Unsupported VLEN");
           UNIMPLEMENTED();
       }
       if (sew == E8) {
@@ -708,8 +714,11 @@ class V8_EXPORT_PRIVATE Assembler : public AssemblerBase,
         case 512:
           lmul = (sew + 1) > E64 ? m1 : mf2;
           break;
+        case 1024:
+          lmul = sew == E64 ? m1 : sew == E32 ? mf2 : mf4;
+          break;
         default:
-          static_assert(kMaxRvvVLEN <= 512, "Unsupported VLEN");
+          static_assert(kMaxRvvVLEN <= 1024, "Unsupported VLEN");
           UNIMPLEMENTED();
       }
       if (sew == E8) {

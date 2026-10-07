@@ -34,6 +34,8 @@
 
 #include "src/codegen/riscv/assembler-riscv.h"
 
+#include <cstdio>
+
 #include "src/base/bits.h"
 #include "src/base/cpu/cpu.h"
 #include "src/codegen/assembler-inl.h"
@@ -135,6 +137,11 @@ void CpuFeatures::ProbeImpl(bool cross_compile) {
     supported_.Add(RVV);
     vlen_ = cpu.vlen();
     DCHECK_NE(vlen_, base::CPU::kUnknownVlen);
+  }
+  std::fprintf(stderr, "RISC-V vector extension: %s\n",
+               cpu.has_rvv() ? "enabled" : "disabled");
+  if (cpu.has_rvv()) {
+    std::fprintf(stderr, "RISC-V CPU vector length (VLEN): %u\n", vlen_);
   }
   if (cpu.has_zba()) supported_.Add(ZBA);
   if (cpu.has_zbb()) supported_.Add(ZBB);

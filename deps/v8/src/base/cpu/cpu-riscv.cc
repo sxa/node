@@ -68,6 +68,20 @@ void CPU::DetectFeatures() {
     }
   }
 
+  // Fallback for boards whose kernel hwprobe does not report the V extension
+  // (e.g. SpacemiT K3 reports RVV via the isa string rv64imafdcvh).
+  char* isa = cpu_info.ExtractField("isa");
+  if (isa != nullptr) {
+    if (strstr(isa, "rv64imafdcvh") != nullptr ||
+        strstr(isa, "rv64imafdcv") != nullptr) {
+      has_fpu_ = true;
+      has_rvv_ = true;
+    } else if (strstr(isa, "rv64imafdc") != nullptr) {
+      has_fpu_ = true;
+    }
+    delete[] isa;
+  }
+
   char* mmu = cpu_info.ExtractField("mmu");
   if (HasListItem(mmu, "sv48")) {
     riscv_mmu_ = RV_MMU_MODE::kRiscvSV48;

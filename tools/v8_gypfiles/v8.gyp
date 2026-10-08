@@ -184,6 +184,29 @@
       },
     },  # torque_runtime_support
     {
+      'target_name': 'torque_generated_csa',
+      'type': 'static_library',
+      'toolsets': ['host', 'target'],
+      'hard_dependency': 1,
+      'dependencies': [
+        'generate_bytecode_builtins_list',
+        'run_torque',
+        'v8_base_without_compiler',
+        'torque_runtime_support',
+        'v8_maybe_icu',
+        'v8_pch',
+        'abseil.gyp:abseil',
+      ],
+      'include_dirs': [
+        '<(SHARED_INTERMEDIATE_DIR)',
+        '<(generate_bytecode_output_root)',
+      ],
+      'sources': [
+        '<@(torque_outputs_csa_cc)',
+        '<@(torque_outputs_csa_h)',
+      ],
+    },  # torque_generated_csa
+    {
       'target_name': 'torque_generated_initializers',
       'type': 'none',
       'toolsets': ['host', 'target'],
@@ -191,6 +214,7 @@
       'dependencies': [
         'generate_bytecode_builtins_list',
         'run_torque',
+        'torque_generated_csa',
         'v8_base_without_compiler',
         'torque_runtime_support',
         'v8_maybe_icu',
@@ -201,8 +225,6 @@
           '<(SHARED_INTERMEDIATE_DIR)/torque-generated/enum-verifiers.cc',
           '<(SHARED_INTERMEDIATE_DIR)/torque-generated/exported-macros-assembler.cc',
           '<(SHARED_INTERMEDIATE_DIR)/torque-generated/exported-macros-assembler.h',
-          '<@(torque_outputs_csa_cc)',
-          '<@(torque_outputs_csa_h)',
         ],
       }
     },  # torque_generated_initializers

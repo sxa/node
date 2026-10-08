@@ -2641,12 +2641,29 @@ foreach(file, torque_files) {
   }
 }
 
-v8_cluster_source_set("torque_generated_initializers") {
+# Pool depth: Node Release defaults to 2 via common.gypi (GYP). For GN, set
+# v8_torque_csa_compile_pool_depth in args.gn (0 = no pool on torque_generated_csa).
+_torque_csa_compile_pool_depth = v8_torque_csa_compile_pool_depth
+
+if (_torque_csa_compile_pool_depth > 0) {
+  pool("torque_csa_compile_pool") {
+    depth = _torque_csa_compile_pool_depth
+  }
+}
+
+# Torque *-tq-csa.cc compilations are memory-heavy (~200+ generated files).
+# Isolate them in their own source set so GN can cap compile parallelism via
+# v8_torque_csa_compile_pool_depth without throttling the rest of the build.
+v8_cluster_source_set("torque_generated_csa") {
   visibility = [ ":*" ]  # Only targets in this file can depend on this.
 
   cluster_prefix = "torque-csa"
   cluster_output_dir = "$target_gen_dir/torque-generated"
   generated_sources = true
+
+  if (_torque_csa_compile_pool_depth > 0) {
+    pool = ":torque_csa_compile_pool"
+  }
 
   deps = [
     ":generate_bytecode_builtins_list",
@@ -2665,23 +2682,7 @@ v8_cluster_source_set("torque_generated_initializers") {
     ":v8_maybe_icu",
   ]
 
-  sources = torque_csa_cc_files + [
-              "$target_gen_dir/torque-generated/bit-field-asserts.cc",
-              "$target_gen_dir/torque-generated/csa-types.h",
-              "$target_gen_dir/torque-generated/enum-verifiers.cc",
-              "$target_gen_dir/torque-generated/exported-macros-assembler.cc",
-              "$target_gen_dir/torque-generated/exported-macros-assembler.h",
-            ]
-
-  # Add headers (always included)
-  sources += torque_csa_h_files
-  if (v8_enable_experimental_tq_to_tsa) {
-    sources += torque_tsa_h_files
-
-    # TSA cc files are not clustered yet
-    sources += torque_tsa_cc_files
-    exclude_from_cluster = torque_tsa_cc_files
-  }
+  sources = torque_csa_cc_files + torque_csa_h_files
 
   configs = [ ":internal_config" ]
 
@@ -2696,6 +2697,50 @@ v8_cluster_source_set("torque_generated_initializers") {
     }
     configs += [ "//build/config/compiler:minimal_symbols" ]
   }
+}
+
+v8_cluster_source_set("torque_generated_initializers") {
+  visibility = [ ":*" ]  # Only targets in this file can depend on this.
+
+  cluster_prefix = "torque-init"
+  cluster_output_dir = "$target_gen_dir/torque-generated"
+  generated_sources = true
+
+  deps = [
+    ":generate_bytecode_builtins_list",
+    ":run_torque",
+    ":torque_generated_csa",
+    ":v8_base_without_compiler",
+    ":v8_maybe_temporal",
+    ":v8_tracing",
+  ]
+  if (v8_enable_experimental_tq_to_tsa) {
+    deps += [ ":run_torque_to_tsa" ]
+  }
+
+  public_deps = [
+    ":torque_runtime_support",
+    ":v8_abseil",
+    ":v8_maybe_icu",
+  ]
+
+  sources = [
+    "$target_gen_dir/torque-generated/bit-field-asserts.cc",
+    "$target_gen_dir/torque-generated/csa-types.h",
+    "$target_gen_dir/torque-generated/enum-verifiers.cc",
+    "$target_gen_dir/torque-generated/exported-macros-assembler.cc",
+    "$target_gen_dir/torque-generated/exported-macros-assembler.h",
+  ]
+
+  if (v8_enable_experimental_tq_to_tsa) {
+    sources += torque_tsa_h_files
+
+    # TSA cc files are not clustered yet
+    sources += torque_tsa_cc_files
+    exclude_from_cluster = torque_tsa_cc_files
+  }
+
+  configs = [ ":internal_config" ]
 }
 
 # Build lists of torque-generated definition files for clustering
@@ -3325,7 +3370,10 @@ v8_cluster_source_set("v8_initializers") {
     "test/cctest:*",
   ]
 
-  allow_circular_includes_from = [ ":torque_generated_initializers" ]
+  allow_circular_includes_from = [
+    ":torque_generated_csa",
+    ":torque_generated_initializers",
+  ]
 
   deps = [
     ":torque_generated_initializers",

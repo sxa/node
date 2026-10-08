@@ -1284,6 +1284,14 @@ parser.add_argument('--v8-enable-temporal-support',
     default=None,
     help='Enable Temporal support in V8.')
 
+parser.add_argument('--v8-torque-csa-pool-depth',
+    action='store',
+    dest='v8_torque_csa_pool_depth',
+    default=None,
+    type=int,
+    help='Max parallel compiles of V8 Torque *-tq-csa.cc files (0 = unlimited). '
+         'Release defaults to 2 in common.gypi if unset.')
+
 parser.add_argument('--node-builtin-modules-path',
     action='store',
     dest='node_builtin_modules_path',
@@ -2231,6 +2239,13 @@ def configure_library(lib, output, pkgname=None):
 
 def configure_v8(o, configs):
   set_configuration_variable(configs, 'v8_enable_v8_checks', release=0, debug=1)
+
+  if options.v8_torque_csa_pool_depth is not None:
+    set_configuration_variable(
+        configs,
+        'v8_torque_csa_compile_pool_depth',
+        release=options.v8_torque_csa_pool_depth,
+        debug=options.v8_torque_csa_pool_depth)
 
   o['variables']['v8_enable_webassembly'] = 0 if options.v8_lite_mode else 1
   o['variables']['v8_enable_javascript_promise_hooks'] = 1

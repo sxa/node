@@ -28,6 +28,21 @@ import re
 import subprocess
 import sys
 
+# Matches tools/v8_gypfiles/v8.gyp torque_generated_csa (see ninja.py).
+_TORQUE_CSA_POOL_TARGET_NAMES = frozenset(["torque_generated_csa"])
+
+
+def _TorqueCsaPoolDepthFromConfig(config):
+    if env := os.environ.get("GYP_TORQUE_CSA_COMPILE_POOL_DEPTH"):
+        return max(0, int(env))
+    for key in ("v8_torque_csa_compile_pool_depth",):
+        if key in config:
+            return max(0, int(config[key]))
+        variables = config.get("variables", {})
+        if key in variables:
+            return max(0, int(variables[key]))
+    return 0
+
 import gyp
 import gyp.common
 import gyp.xcode_emulation
@@ -896,6 +911,9 @@ $(obj).$(TOOLSET)/$(TARGET)/%%.o: $(obj)/%%%s FORCE_DO_CMD
         self.WriteLn("TOOLSET := " + self.toolset)
         self.WriteLn("TARGET := " + self.target)
 
+        if self.target in _TORQUE_CSA_POOL_TARGET_NAMES:
+            self.WriteTorqueCsaCompilePoolCmdOverrides(configs)
+
         # Actions must come first, since they can generate more OBJs for use below.
         if "actions" in spec:
             self.WriteActions(
@@ -1528,6 +1546,33 @@ $(obj).$(TOOLSET)/$(TARGET)/%%.o: $(obj)/%%%s FORCE_DO_CMD
         extra_link_deps += [source for source in sources if Linkable(source)]
 
         self.WriteLn()
+
+    def WriteTorqueCsaCompilePoolCmdOverrides(self, configs):
+        """Wrap CXX for torque_generated_csa to cap parallel compiles (make backend)."""
+        depth_by_config = {
+            configname: _TorqueCsaPoolDepthFromConfig(config)
+            for configname in configs
+        }
+        if not any(depth_by_config.values()):
+            return
+
+        self.WriteLn("# Limit parallel Torque *-tq-csa.cc compiles (memory).")
+        for configname in sorted(depth_by_config.keys()):
+            self.WriteLn("ifeq ($(BUILDTYPE),%s)" % configname)
+            self.WriteLn(
+                "TORQUE_CSA_COMPILE_POOL_DEPTH := %d"
+                % depth_by_config[configname]
+            )
+            self.WriteLn("endif")
+
+        pool_py = "$(abspath $(srcdir))/tools/torque-csa-compile-pool.py"
+        self.WriteLn(
+            "cmd_cxx = %s $(TORQUE_CSA_COMPILE_POOL_DEPTH) "
+            "$(CXX.$(TOOLSET)) -o $@ $< "
+            "$(GYP_CXXFLAGS) $(DEPFLAGS) $(CXXFLAGS.$(TOOLSET)) -c"
+            % pool_py
+        )
+        self.WriteLn("")
 
     def WritePchTargets(self, pch_commands):
         """Writes make rules to compile prefix headers."""

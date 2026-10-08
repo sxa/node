@@ -24,6 +24,11 @@ import gyp.xcode_emulation
 from gyp import MSVSUtil, ninja_syntax
 from gyp.common import GetEnvironFallback
 
+# GYP targets whose .cc compiles are capped by torque_csa_compile_pool (see
+# tools/v8_gypfiles/v8.gyp torque_generated_csa). Do not apply the pool to
+# other targets or by loose path matching.
+_TORQUE_CSA_POOL_TARGET_NAMES = frozenset(["torque_generated_csa"])
+
 generator_default_variables = {
     "EXECUTABLE_PREFIX": "",
     "EXECUTABLE_SUFFIX": "",
@@ -384,6 +389,18 @@ class NinjaWriter:
         self.name = spec["target_name"]
         self.toolset = spec["toolset"]
         config = spec["configurations"][config_name]
+        self.torque_csa_compile_pool_depth = 0
+        if self.name in _TORQUE_CSA_POOL_TARGET_NAMES:
+            config_variables = config.get("variables", {})
+            for key in ("v8_torque_csa_compile_pool_depth",):
+                if key in config:
+                    self.torque_csa_compile_pool_depth = max(0, int(config[key]))
+                    break
+                if key in config_variables:
+                    self.torque_csa_compile_pool_depth = max(
+                        0, int(config_variables[key])
+                    )
+                    break
         self.target = Target(spec["type"])
         self.is_standalone_static_library = bool(
             spec.get("standalone_static_library", 0)
@@ -1253,6 +1270,19 @@ class NinjaWriter:
                     cflags_cc,
                     self.ExpandSpecial,
                 )
+            if (
+                self.torque_csa_compile_pool_depth > 0
+                and self.name in _TORQUE_CSA_POOL_TARGET_NAMES
+                and command in ("cc", "cxx", "objc", "objcxx")
+            ):
+                if variables:
+                    if isinstance(variables, dict):
+                        variables = list(variables.items())
+                    variables = list(variables)
+                else:
+                    variables = []
+                variables.append(("pool", "torque_csa_compile_pool"))
+
             ninja_file.build(
                 output,
                 command,
@@ -2077,6 +2107,24 @@ def CommandWithWrapper(cmd, wrappers, prog):
     return prog
 
 
+def GetTorqueCsaCompilePoolDepth(target_dicts, config_name):
+    """Max parallel compiles for Torque *-tq-csa.cc (0 = no pool)."""
+    if env := os.environ.get("GYP_TORQUE_CSA_COMPILE_POOL_DEPTH"):
+        return max(0, int(env))
+
+    for qualified_target, spec in target_dicts.items():
+        if "v8.gyp" not in qualified_target:
+            continue
+        config = spec.get("configurations", {}).get(config_name, {})
+        for key in ("v8_torque_csa_compile_pool_depth",):
+            if key in config:
+                return max(0, int(config[key]))
+            variables = config.get("variables", {})
+            if key in variables:
+                return max(0, int(variables[key]))
+    return 0
+
+
 def GetDefaultConcurrentLinks():
     """Returns a best-guess for a number of concurrent links."""
     if pool_size := int(os.environ.get("GYP_LINK_CONCURRENCY") or 0):
@@ -2392,6 +2440,11 @@ def GenerateOutputForConfig(target_list, target_dicts, data, params, config_name
     master_ninja.newline()
 
     master_ninja.pool("link_pool", depth=GetDefaultConcurrentLinks())
+    torque_csa_pool_depth = GetTorqueCsaCompilePoolDepth(
+        target_dicts, config_name
+    )
+    if torque_csa_pool_depth > 0:
+        master_ninja.pool("torque_csa_compile_pool", depth=torque_csa_pool_depth)
     master_ninja.newline()
 
     deps = "msvc" if flavor == "win" else "gcc"

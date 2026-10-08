@@ -45,6 +45,11 @@ if (!build_with_v8_embedder && !(defined(build_with_node) && build_with_node)) {
 # For faster Windows builds. See https://crbug.com/v8/8475.
 emit_builtins_as_inline_asm = is_win && is_clang
 
+# Define a pool to limit parallelism for torque-generated CSA files
+pool("torque_csa_pool") {
+  depth = 4  # Limit to 4 parallel compilations of tq-csa.cc files
+}
+
 declare_args() {
   # Print to stdout on Android.
   v8_android_log_stdout = false
@@ -2875,6 +2880,9 @@ foreach(file, torque_files) {
 
 v8_cluster_source_set("torque_generated_initializers") {
   visibility = [ ":*" ]  # Only targets in this file can depend on this.
+
+  # Limit parallelism for tq-csa.cc files to avoid memory issues
+  pool = ":torque_csa_pool"
 
   cluster_prefix = "torque-csa"
   cluster_output_dir = "$target_gen_dir/torque-generated"

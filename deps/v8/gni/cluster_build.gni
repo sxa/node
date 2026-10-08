@@ -13,6 +13,13 @@ declare_args() {
   # worth setting to 100.
   # You can override this in a args.gn file.
   cluster_size = 25
+
+  # Limits how many Torque-generated *-tq-csa.cc files (or cluster
+  # amalgamations of them) compile at once. Each compilation can use
+  # multiple GiB of RAM. 0 uses an optimized-build default (2) unless is_debug;
+  # set to a positive value to override, or use args.gn with is_debug for no cap.
+  # Node sets this via common.gypi for GYP builds (Release: 2, Debug: 0).
+  v8_torque_csa_compile_pool_depth = 0
 }
 
 # Smaller cluster size for heavy directories (turboshaft, maglev).

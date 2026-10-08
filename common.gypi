@@ -92,6 +92,9 @@
     'v8_use_perfetto%': 0,
     'tsan%': 0,
 
+    # Cap parallel compiles of Torque *-tq-csa.cc (memory-heavy). 0 disables.
+    'v8_torque_csa_compile_pool_depth%': 0,
+
     ##### end V8 defaults #####
 
     'conditions': [
@@ -137,6 +140,7 @@
     'configurations': {
       'Debug': {
         'variables': {
+          'v8_torque_csa_compile_pool_depth': 0,
           'v8_enable_handle_zapping': 1,
           'conditions': [
             ['node_shared != "true"', {
@@ -179,6 +183,7 @@
       },
       'Release': {
         'variables': {
+          'v8_torque_csa_compile_pool_depth': 2,
           'v8_enable_handle_zapping': 0,
           'pgo_generate': ' -fprofile-generate ',
           'pgo_use': ' -fprofile-use -fprofile-correction ',

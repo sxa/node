@@ -884,7 +884,7 @@ test-sbom: ## Validate the SBOM written by `make sbom`.
 
 .PHONY: doc-only
 .NOTPARALLEL: doc-only
-doc-only: $(apidoc_dirs) $(apidocs_html) $(apidocs_json) out/doc/api/all.json out/doc/llms.txt out/doc/apilinks.json  ## Builds the docs with the local or the global Node.js binary.
+doc-only: $(apidoc_dirs) $(apidocs_html) $(apidocs_json) out/doc/api/all.json out/doc/apilinks.json  ## Builds the docs with the local or the global Node.js binary.
 
 .PHONY: doc
 doc: $(NODE_EXE) doc-only ## Build Node.js, and then build the documentation with the new binary.
